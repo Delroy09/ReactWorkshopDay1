@@ -18,8 +18,10 @@ exports.getUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
-      where: { id: req.params.id }
+      where: { id: parseInt(req.params.id) }
     });
+
+    //select id,name,email from users where id = 1 
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -74,7 +76,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const user = await prisma.user.update({
-      where: { id: req.params.id },
+      where: { id: parseInt(req.params.id) },
       data
     });
 
@@ -95,7 +97,7 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     await prisma.user.delete({
-      where: { id: req.params.id }
+      where: { id: parseInt(req.params.id) }
     });
 
     res.json({ message: "User deleted" });
@@ -111,3 +113,25 @@ exports.deleteUser = async (req, res) => {
 exports.testRoutes = async (req, res) => {
     res.json({ message: "New change by nikesh!!!!!" });
 };
+
+
+
+
+// GET user by name
+exports.getUserByName = async (req, res) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { name: req.params.name },
+      select: { id: true, name: true, email: true }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user", error: error.message });
+  }
+};
+
